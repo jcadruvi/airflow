@@ -1,12 +1,10 @@
-"""
-Code that goes along with the Airflow located at:
-http://airflow.readthedocs.org/en/latest/tutorial.html
-"""
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
+from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
 
-from dags.settings import AIRFLOW_ERROR_EMAIL
+from news.news_task import NewsTask
+from settings import AIRFLOW_ERROR_EMAIL
 
 
 default_args = {
@@ -24,10 +22,16 @@ default_args = {
     # 'end_date': datetime(2016, 1, 1),
 }
 
-dag = DAG(
-    'tutorial', default_args=default_args, schedule_interval=timedelta(1))
+dag = DAG('news', default_args=default_args, schedule_interval=timedelta(1))
 
-# t1, t2 and t3 are examples of tasks created by instantiating operators
+#t1, t2 and t3 are examples of tasks created by instantiating operators
+t0 = PythonOperator(
+    task_id="test_hive",
+    python_callable=NewsTask().show_table,
+    provide_context=True,
+    dag=dag
+)
+
 t1 = BashOperator(
     task_id='print_date',
     bash_command='date',
@@ -53,5 +57,6 @@ t3 = BashOperator(
     params={'my_param': 'Parameter I passed in'},
     dag=dag)
 
+t1.set_upstream(t0)
 t2.set_upstream(t1)
 t3.set_upstream(t1)

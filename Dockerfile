@@ -4,7 +4,7 @@
 # BUILD: docker build --rm -t puckel/docker-airflow .
 # SOURCE: https://github.com/puckel/docker-airflow
 
-FROM python:3.6-slim
+FROM python:2.7-slim
 MAINTAINER Puckel_
 
 # Never prompts the user for choices on installation/configuration of packages
@@ -46,6 +46,7 @@ RUN set -ex \
         rsync \
         netcat \
         locales \
+        vim \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
@@ -70,6 +71,13 @@ RUN set -ex \
 
 COPY script/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+COPY dags ${AIRFLOW_HOME}/dags
+COPY requirements.txt ${AIRFLOW_HOME}/data_pipeline/requirements.txt
+COPY requirements-test.txt ${AIRFLOW_HOME}/data_pipeline/requirements-test.txt
+
+RUN pip install -r ${AIRFLOW_HOME}/data_pipeline/requirements.txt
+RUN pip install -r ${AIRFLOW_HOME}/data_pipeline/requirements-test.txt
+RUN pip install thrift-sasl==0.2.1 --no-deps
 
 RUN chown -R airflow: ${AIRFLOW_HOME}
 
