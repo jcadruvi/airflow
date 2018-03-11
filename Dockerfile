@@ -4,8 +4,8 @@
 # BUILD: docker build --rm -t puckel/docker-airflow .
 # SOURCE: https://github.com/puckel/docker-airflow
 
-FROM python:2.7-slim
-MAINTAINER Puckel_
+FROM python:2.7
+MAINTAINER Josh Cadruvi <jcadruvi78@yahoo.com>
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -22,9 +22,30 @@ ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
 
+RUN \
+    echo "===> add webupd8 repository..."  && \
+    echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | tee /etc/apt/sources.list.d/webupd8team-java.list  && \
+    echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list  && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886  && \
+    apt-get update  && \
+    \
+    \
+    echo "===> install Java"  && \
+    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections  && \
+    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections  && \
+    DEBIAN_FRONTEND=noninteractive  apt-get install -y --force-yes oracle-java8-installer oracle-java8-set-default  && \
+    \
+    \
+    echo "===> clean up..."  && \
+    rm -rf /var/cache/oracle-jdk8-installer  && \
+    apt-get clean  && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+
 RUN set -ex \
     && buildDeps=' \
-        python3-dev \
+        python2.7-dev \
         libkrb5-dev \
         libsasl2-dev \
         libssl-dev \
@@ -39,8 +60,6 @@ RUN set -ex \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
-        python3-pip \
-        python3-requests \
         apt-utils \
         curl \
         rsync \

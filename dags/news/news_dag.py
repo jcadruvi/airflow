@@ -33,8 +33,8 @@ t0 = PythonOperator(
 )
 
 t1 = BashOperator(
-    task_id='print_date',
-    bash_command='date',
+    task_id='test_spark',
+    bash_command='/usr/local/lib/python2.7/site-packages/pyspark/bin/spark-submit --master local[4] /usr/local/airflow/data_pipeline/spark/simple_app.py',
     dag=dag)
 
 t2 = BashOperator(

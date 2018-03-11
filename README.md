@@ -16,6 +16,7 @@ In Order to start this project do the following:
 5) Edit the hiveserver2_default configuration setting to the following:
 
     Host: cloudera
+    Port: 10000
     Login: cloudera
     Password: cloudera
 
@@ -23,6 +24,12 @@ In Order to start this project do the following:
 7) Run: airflow list_dags
    This should show several dags.
 8) Know you can run airflow commands.
+
+SPARK_HOME locally is /usr/local/lib/python2.7/site-packages/pyspark/bin
+Submit Spark job:
+    /usr/local/lib/python2.7/site-packages/pyspark/bin/spark-submit --master local[4] spark/simple_app.py
+Another alternative
+    python spark/simple_app.py
 
 Docker Commands:
 
@@ -40,3 +47,8 @@ sudo service hadoop-hdfs-datanode start
 
 sudo service hue stop
 sudo service hue start
+
+
+Good Cloudera Quickstart VM Documentation:
+    https://www.cloudera.com/documentation/enterprise/5-5-x/PDF/cloudera-quickstart.pdf
+    https://www.cloudera.com/documentation/enterprise/5-12-x/PDF/cloudera-quickstart.pdf
